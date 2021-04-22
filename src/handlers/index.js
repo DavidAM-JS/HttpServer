@@ -3,7 +3,7 @@ const http = require('http');
 const os = require('os');
 
 const welcome = (request, response) => {
-    response.writeHead(200, { 'Content-Type': 'text/plain' });
+    response.writeHead(200, { 'Content-Type': 'text/html' });
     const txt = fs.readFileSync('./src/public/welcome.html', 'utf-8');
     response.write(txt);
     response.end();
@@ -18,18 +18,22 @@ const books = (request, response) => {
             response.end(`\n\nHello from ${request.url} using ${request.method}`);
             break;
         case 'POST':
-            response.writeHead(200, { 'Content-Type': 'text/plain' });
             let aditionalData = '';
             request.on('data', (chunk) => {
                 aditionalData += chunk;
             });
-            fs.appendFileSync('./src/public/example.txt', `${aditionalData}`, 'utf-8');
-            response.end(`\n\nHello from ${request.url} using ${request.method}`);
+            request.on('end', () => {
+                response.writeHead(200, { 'Content-Type': 'application/json' });
+                fs.appendFileSync('./src/public/example.txt', `${aditionalData}\n\n`, 'utf-8');
+                response.end(`\n\nHello from ${request.url} using ${request.method}`);
+            });
             break;
         case 'DELETE':
             response.writeHead(200, { 'Content-Type': 'text/plain' });
             fs.truncateSync('./src/public/example.txt', 0)
             response.end(`\n\nDelete from ${request.url} using ${request.method}`);
+            break;
+        default:
             break;
     }
 }
