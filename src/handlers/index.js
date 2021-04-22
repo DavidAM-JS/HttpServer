@@ -19,10 +19,10 @@ const books = (request, response) => {
             break;
         case 'POST':
             let aditionalData = '';
-            request.on('data', (chunk) => {
+            request.on('data', function(chunk){
                 aditionalData += chunk;
             });
-            request.on('end', () => {
+            request.on('end', function(){
                 response.writeHead(200, { 'Content-Type': 'application/json' });
                 fs.appendFileSync('./src/public/example.txt', `${aditionalData}\n\n`, 'utf-8');
                 response.end(`\n\nHello from ${request.url} using ${request.method}`);
